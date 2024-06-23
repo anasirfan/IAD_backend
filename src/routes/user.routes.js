@@ -23,5 +23,4 @@ router.route("/id").post(findUserById);
 router.route("/").get(getAllUser)
 router.route("/id").delete(deleteUser)
 
-
 export default router;

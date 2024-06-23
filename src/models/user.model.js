@@ -2,15 +2,7 @@ import mongoose , {Schema} from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const generateRoleId = async () => {
-    const roleId = Math.random().toString(36).substring(2, 15);
-    const user = await User.findOne({ roleId });
-    if (user) {
-        // If the role ID already exists, generate a new one
-        return generateRoleId();
-    }
-    return roleId;
-};
+
 
 const userSchema = new Schema(
     {
