@@ -7,32 +7,12 @@ import jwt from "jsonwebtoken"
 
 const registerUser = asyncHandler(async (req, res) => {
   
-  // get user detail from frontend
-  // validation - empty
-  // check if user already exist through email
-  // check for images , check for avatar
-  // upload them to cloudinary , avatar
-  // create user object -create entry in DB
-  // remove password and refresh token in user response
-  // check for user creation
-  // return response
-
-
 
   // getting the parameters from the req body 
-  const { userName, email, fullName, password } = req.body;
+  const { userName, email, fullName, password ,roleId } = req.body;
 
   console.log("email : ", email);
 
-  // for (const prop in req.body) {
-  //   if (Object.hasOwnProperty.call(req.body, prop)) {
-  //     const field = req.body[prop].toString().trim();
-
-  //     if (field == "") {
-  //       throw new ApiError(400, is`${field} is required`);
-  //     }
-  //   }
-  // }
 
 
 
@@ -53,38 +33,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "user with email or username already exist");
   }
 
-  // checking for avatar local path
-  const localAvatarPath = req.files?.avatar[0]?.path;
-  console.log("the path of cover image is ",localAvatarPath);
-
-  // checking for cover image local path and adding condidition since it is not required
-  let localCoverImagePath;
-  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
-    localCoverImagePath = req.files.coverImage[0].path;
-    console.log(`this ${localCoverImagePath}`);
-    
+  if(!roleId){
+    throw new ApiError(400, "role id required");
   }
 
-  if (!localAvatarPath) {
-    throw ApiError(400, "Avatar image is required");
-  }
-
-
-  // uploading on cloudinary
-    const avatar =await uploadOnCloudinary(localAvatarPath);
-    const coverImage = await uploadOnCloudinary(localCoverImagePath);
-
-
-
-    if(!avatar){
-        throw new ApiError(400,"Avatar image is required");
-    }
-
+ 
     // inserting into database
     const user = await User.create({
-        fullName,
-        avatar:avatar.url,
-        coverImage: coverImage?.url || "",
         email,
         password,
         userName: userName.toLowerCase()
@@ -198,6 +153,7 @@ const logoutUser = asyncHandler(async (req,res)=>{
 const generateAccessAndRefreshToken = async (userID)=>{
   try{
     const user = await User.findById(userID);
+    
 
     // at this point i have my both access and refresh token
     const accessToken = user.generateAccessToken();
@@ -219,7 +175,6 @@ const generateAccessAndRefreshToken = async (userID)=>{
     throw new ApiError(500,"something went wrong while generating the refresh and access token");
   }
 }
-
 
 const refreshAccessToken = asyncHandler(async(req,res)=>{
   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
@@ -264,8 +219,41 @@ const refreshAccessToken = asyncHandler(async(req,res)=>{
   }catch(e){
     throw new ApiError(401,e?.message|| "invalid refresh token")
   }
-  
- 
+})
+
+
+const findUserById = asyncHandler(async(req,res)=>{
+  const searchedUser = await User.findOne(req.body)
+  if(!searchedUser){
+    throw new ApiError(400, "no user exists by this id");
+  }
+  res.status(200).json(
+    new ApiResponse(200,searchedUser,"user:")
+);
+})
+
+
+const getAllUser = asyncHandler(async(req,res)=>{
+  const list = await User.find();
+  console.log(list);
+
+  res.status(200).json(
+    new ApiResponse(200,list,"users list:")
+);
+})
+
+const deleteUser = asyncHandler(async(req,res)=>{
+  const response = await User.findOneAndDelete(req.body);
+
+
+  if(!response){
+    throw new ApiError(400, "no user exists by this id");
+  }
+
+  console.log("user successfully deleted",response);
+  res.status(200).json(
+    new ApiResponse(200,response,"user deleted:")
+);
 })
 
 
@@ -274,4 +262,8 @@ export {
   registerUser,
   loginUser, 
   logoutUser,
-  refreshAccessToken };
+  refreshAccessToken,
+  findUserById,
+  getAllUser,
+  deleteUser
+ };

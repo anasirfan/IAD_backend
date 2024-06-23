@@ -2,9 +2,18 @@ import mongoose , {Schema} from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+const generateRoleId = async () => {
+    const roleId = Math.random().toString(36).substring(2, 15);
+    const user = await User.findOne({ roleId });
+    if (user) {
+        // If the role ID already exists, generate a new one
+        return generateRoleId();
+    }
+    return roleId;
+};
 
-
-const userSchema = new Schema({
+const userSchema = new Schema(
+    {
     userName:{
         type:String,
         required:true,
@@ -22,28 +31,6 @@ const userSchema = new Schema({
         lowercase:true
     },
 
-    fullName:{
-        type:String,
-        required:true,
-        trim:true,
-        lowercase:true
-    },
-    
-    avatar:{
-        type:String, // cloudinary service will be used to store the image
-        required:true
-    },
-
-    coverImage:{
-        type:String
-    },
-
-    watchHistory:[
-        {
-            type:Schema.Types.ObjectId,
-            ref:"Video"
-        }
-    ],
 
     password:{
         type:String,
@@ -51,7 +38,14 @@ const userSchema = new Schema({
     },
     refreshToken:{
         type:String
+    },
+
+    roleId: {
+        type: String,
+        unique: true
     }
+
+
 
 },{timestamps:true})
 
@@ -64,6 +58,7 @@ userSchema.pre("save", async function(next){
     this.password = await bcrypt.hash(this.password,10);
     next();
 })
+
 
 // checking if the encrypted password is equal to the actual user password
 userSchema.methods.isPasswordCorrect = async function(password){
@@ -100,4 +95,5 @@ userSchema.methods.generateRefreshToken = function(){
         }
     )
 }   
+
 export const User = mongoose.model("User",userSchema);
