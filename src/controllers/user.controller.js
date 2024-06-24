@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req, res) => {
   
 
   // getting the parameters from the req body 
-  const { userName, email, fullName, password ,roleId } = req.body;
+  const { userName, email, fullName, password ,roleId, } = req.body;
 
   console.log("email : ", email);
 
@@ -28,6 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const existedUser = await User.findOne({
     $or: [{ userName }, { email }],
   });
+  
 
   if (existedUser) {
     throw new ApiError(409, "user with email or username already exist");

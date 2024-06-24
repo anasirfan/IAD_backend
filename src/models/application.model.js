@@ -37,7 +37,7 @@ const applicationSchema = new Schema(
         type: String,
     },
 
-    id: {
+    userId: {
         type:mongoose.Types.ObjectId,
         ref:"User"
     }
