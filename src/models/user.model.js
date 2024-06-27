@@ -30,8 +30,7 @@ const userSchema = new Schema(
     },
 
     roleId: {
-        type: String,
-        unique: true
+        type: String
     }
 
 },{timestamps:true})

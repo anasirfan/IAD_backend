@@ -8,20 +8,19 @@ import { Interview } from "../models/interview.model.js"
 
 const scheduleInterview = asyncHandler(async(req,res)=>{
 
-    const {interviewTime ,interviewType ,interviewDate} = req.body;
+    const {userId , candidateName , position , interviewTime ,interviewDate} = req.body;
 
-    if([interviewTime,interviewType,interviewDate].some(
+    if([candidateName,position,interviewTime,interviewDate].some(
         (field) => field?.toString().trim() == ""
     )){
         throw new ApiError(400, is`${field} is required`);
     }
 
 
-    const userId = req.user._id;
-
     const scheduledInterview = await Interview.create({
+        candidateName,
+        position,
         interviewTime,
-        interviewType,
         interviewDate,
         userId
     })

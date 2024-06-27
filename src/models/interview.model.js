@@ -6,11 +6,13 @@ const interviewSchema = new Schema(
     interviewTime: {
         type: String,
     },
-
-    interviewType: {
+    interviewDate: {
         type: String,
     },
-    interviewDate: {
+    candidateName: {
+        type: String,
+    },
+    position: {
         type: String,
     },
 

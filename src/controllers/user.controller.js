@@ -12,6 +12,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { userName, email, fullName, password ,roleId, } = req.body;
 
   console.log("email : ", email);
+  console.log("user : ", userName);
 
 
 
@@ -43,7 +44,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         email,
         password,
-        userName: userName.toLowerCase()
+        userName: userName,
+        roleId: roleId
     })
 
     // removing the password and refresh token and sending it to the response
@@ -51,7 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
     )
 
-    if(!createdUser){
+    if(!createdUser){ 
     throw new ApiError(500, "something went wrong while registering a user");
     }   
 
@@ -68,16 +70,16 @@ const loginUser = asyncHandler(async (req,res)=>{
   // access token and refresh token
   // send cookie
 
-  const {email,userName,password} = req.body;
+  const {email,password} = req.body;
 
   console.log("the email is ",email);
 
-  if(!userName && !email){
+  if(!password && !email){
     throw new ApiError(400,"password and email is required")
   }
 
   const user = await User.findOne({
-    $or: [{email} ,{userName}]
+    $or: [{email}]
   })
 
   if(!user){

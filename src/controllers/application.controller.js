@@ -7,7 +7,7 @@ import { User } from "../models/user.model.js";
 
 
 const createApplication = asyncHandler(async(req,res)=>{
-    const { candidateName, candidateEmail,position, education, experience ,type } = req.body;
+    const { candidateName, candidateEmail,position, education, experience ,type, userId} = req.body;
 
     console.log("candidate email is : ", candidateEmail);
 
@@ -28,7 +28,6 @@ const createApplication = asyncHandler(async(req,res)=>{
         throw new ApiError(409, "user does not exist with email or username");
       }
 
-      const userId = req.user._id;
 
     const createdApplication = await Application.create({
         candidateName,

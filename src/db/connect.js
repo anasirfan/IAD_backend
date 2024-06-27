@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {DB_NAME1} from "../constants.js";
 import express from "express";
 
-
+  
 const app = express();
 const connectDB = async ()=>{
 
